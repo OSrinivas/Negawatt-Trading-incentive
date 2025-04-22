@@ -1,0 +1,161 @@
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.0;
+
+contract DonationIncentiveFCFS {
+    address public owner;
+    uint public requiredTokens;
+    uint public eventId;
+    uint public totalCollected;
+    bool public finalized;
+    bool public initialized;
+
+    struct Participant {
+        uint participantId;
+        address wallet;
+        uint commitment;
+        uint actualDonation;
+        uint amountMissed;
+        int incentive;
+        int penalty;
+        int balance;
+    }
+
+    Participant[] public participants;
+
+    modifier onlyOwner() {
+        require(msg.sender == owner, "Not contract owner");
+        _;
+    }
+
+    constructor() {
+        owner = msg.sender;
+    }
+
+    function initialize(uint _eventId,uint _requiredTokens) public onlyOwner returns(bool success,string memory message){
+        // require(!initialized, "Already initialized");
+        if(initialized){
+            success=false;
+            message="Event already initialized";
+            
+        }else{
+            eventId=_eventId;
+            requiredTokens = _requiredTokens;
+            initialized = true;
+            success=true;
+            message='Event initialized success';
+
+        }
+        
+    }
+    function reset() public onlyOwner returns(bool success,string memory message){
+        // require(initialized, "Not initialized");
+        if(!initialized){
+            success=false;
+            message="Event already unintialized";
+        }else{
+            delete participants;
+            initialized=false;
+            success=true;
+            finalized=false;
+            message="Event initialized success";
+        }
+
+        
+    }
+
+    function registerParticipant(uint _participantId, uint _commitment, uint _actualDonation) public returns(bool success,string memory message){
+        // require(initialized, "Not initialized");
+        if(!initialized){
+            success=false;
+            message="Event not initialized";
+            
+        }else{
+            participants.push(Participant({
+            participantId: _participantId,
+            wallet: msg.sender,
+            commitment: _commitment,
+            actualDonation: _actualDonation,
+            amountMissed: 0,
+            incentive: 0,
+            penalty: 0,
+            balance: 0
+            }));
+
+            success=true;
+            message='participant registered successfully';
+        }
+        
+    }
+
+function finalizeResults() public onlyOwner returns(bool success,string memory message) {
+    // require(!finalized, "Already finalized");
+    if(finalized){
+        success=false;
+        message="Already finalized";
+    }else{
+        finalized = true;
+
+
+        uint remainingNeed = requiredTokens;
+
+        for (uint i = 0; i < participants.length; i++) {
+            Participant storage p = participants[i];
+            if (remainingNeed == 0) {
+                p.amountMissed = 0;
+                p.incentive = 0;
+                p.penalty = 0;
+                p.balance = 0;
+            } else {
+                if (p.actualDonation >= remainingNeed) {
+                    totalCollected+=remainingNeed;
+                    p.amountMissed = 0;
+                    p.penalty = 0;
+                    p.incentive = int(remainingNeed * 10);
+                    p.balance = p.incentive;
+                    remainingNeed = 0;
+                } else {
+                    p.amountMissed = p.commitment - p.actualDonation;
+                    p.penalty = int(p.amountMissed * 5);
+                    p.incentive = int(p.actualDonation * 10);
+                    p.balance = p.incentive - p.penalty;
+                    remainingNeed -= p.actualDonation;
+                    totalCollected+=p.actualDonation;
+                }
+            }
+        }
+        success=true;
+        message="finalized success";
+
+    }
+    
+}
+
+
+
+
+function getResults() public view returns (uint rtokens,int[][] memory data, bool contractSuccess,uint ceventId ) {
+    uint count = participants.length;
+    data = new int[][](count); // outer array of int arrays
+
+    for (uint i = 0; i < count; i++) {
+        int[] memory row= new int[](7); // inner array with signed ints
+        Participant memory p = participants[i];
+
+        row[0] = int(p.participantId);      // casting from uint to int
+        row[1]= int(p.commitment);           //commitment
+        row[2]= int(p.actualDonation);       //contribution                                                      
+        row[3] = int(p.amountMissed);       // safe since amountMissed >= 0
+        row[4] = p.incentive;               // already int
+        row[5] = p.penalty;                 // already int
+        row[6] = p.balance;                 // already int
+
+        data[i] = row;
+    }
+
+    contractSuccess = totalCollected >= requiredTokens;
+    ceventId=eventId;
+    rtokens=requiredTokens;
+
+    }
+
+}
