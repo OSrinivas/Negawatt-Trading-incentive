@@ -10,6 +10,7 @@ contract NegawattIncentiveCurtailment {
     bool public initialized;
     bool public isCommitZero;
     mapping(uint => bool) private isUsedId;
+    uint public totalCommitment;
     uint[] private consumers;
 
 
@@ -46,6 +47,7 @@ contract NegawattIncentiveCurtailment {
             initialized = true;
             success=true;
             isCommitZero=true;
+            totalCommitment=0;
             message='Event initialized success';
 
         }
@@ -87,7 +89,8 @@ contract NegawattIncentiveCurtailment {
             requiredTokens=0;
             isCommitZero=true;
             totalCollected=0;
-            message="Event Successfully Initialized";
+            totalCommitment=0;
+            message="Start New Event";
         }
 
         
@@ -147,8 +150,8 @@ function finalizeResults() public onlyOwner returns(bool success,string memory m
             p.incentive = 0;
             p.penalty = 0;
             p.balance = 0;
-
         }
+        totalCommitment=0;
 
     }else{
         finalized = true;
@@ -158,6 +161,7 @@ function finalizeResults() public onlyOwner returns(bool success,string memory m
 
         for (uint i = 0; i < participants.length; i++) {
             Participant storage p = participants[i];
+            totalCommitment+=p.actualSupply;
             if (remainingNeed == 0) {
                 p.amountMissed = 0;
                 p.incentive = 0;
@@ -181,6 +185,7 @@ function finalizeResults() public onlyOwner returns(bool success,string memory m
                 }
             }
         }
+
         success=true;
         message="Event successfully finalized";
 
@@ -191,7 +196,7 @@ function finalizeResults() public onlyOwner returns(bool success,string memory m
 
 
 
-function getResults() public view returns (bool _isCommitZero,uint rtokens,int[][] memory data, bool contractSuccess,uint ceventId ) {
+function getResults() public view returns (bool _isCommitZero,uint rtokens,int[][] memory data, bool contractSuccess,uint ceventId,uint _totalCommitment ) {
     require(initialized, "event not Initialized");//should initialized
     require(finalized, "Result not finalized");//should finalized
     uint count = participants.length;
@@ -216,6 +221,7 @@ function getResults() public view returns (bool _isCommitZero,uint rtokens,int[]
 
     contractSuccess = totalCollected >= requiredTokens;
     ceventId=eventId;
+    _totalCommitment=totalCommitment;
     rtokens=requiredTokens;
 
     }

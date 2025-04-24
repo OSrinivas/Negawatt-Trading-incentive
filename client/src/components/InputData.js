@@ -10,7 +10,7 @@ function InputData({contract}) {
   const [consumerId,setConsumerId]=useState('');
   const [showAlert,setShowAlert]=useState(false);
   const [AlertData,setAlertData]=useState('');
-
+  const[totalCommitment,setTotalCommitment]=useState('');
  
   const [requiredToken,setRequiredToken]=useState('');
   const [eventId,setEventId]=useState('');
@@ -22,6 +22,7 @@ function InputData({contract}) {
   const [commitment,setCommitment]=useState('');
   const [actual,setActual]=useState('');
 
+  
   function handleIdChange(e){
     setId(e.target.value);
   }
@@ -129,13 +130,15 @@ function InputData({contract}) {
     try {
       // const tx=await contract.finalizeResults();
       // await tx.wait();
-      const [isCommitZero,rtokens,data, contractSuccess,eventId]=await contract.getResults();
+      const [isCommitZero,rtokens,data, contractSuccess,eventId,_totalCommit]=await contract.getResults();
       // console.log("Array Data:", data);          // 2D array
       // console.log("Contract Success:", contractSuccess); // boolean
+      
       setEventId(Number(eventId));
       setRequiredToken(Number(rtokens));
       setSuccess(contractSuccess);
-      console.log(`contractsuccess :${contractSuccess} eventId:${eventId} rtokens:${rtokens}`);
+      console.log(`contractsuccess :${contractSuccess} eventId:${eventId} rtokens:${rtokens}  {_totalCommit}`);
+      setTotalCommitment(Number(_totalCommit));
       // console.log("data :",data);
       const formatted = data.map(row => ({
         participantId: Number(row[0]),
@@ -374,7 +377,7 @@ return (
           <>
 
             <h2 className="text-xl font-bold mb-4 text-green-900 text-center">
-              Negawatt Event Results (Required Token: {requiredToken} KWh)
+              Negawatt Event Results (Required Negawatt: {requiredToken} kWh , Total Contribution: {totalCommitment} kWh)
             </h2>
 
             <div className={`text-center mb-4 ${success ? 'text-green-600' : 'text-red-600'}`}>
