@@ -139,60 +139,63 @@ function finalizeResults() public onlyOwner returns(bool success,string memory m
         
         success=false;
         message= finalized ? "Event already finalized":"Event not initialised";
-    }else if(isCommitZero){
+    } else if(isCommitZero){
         finalized=true;
         success=true;
         message="No participant have any commitment";
         finalized = true;
         for (uint i = 0; i < participants.length; i++) {
             Participant storage p = participants[i];
-            p.amountMissed = p.commitment;//all are missed as zero commitment
+            p.amountMissed = p.commitment; // all are missed as zero commitment
             p.incentive = 0;
             p.penalty = 0;
             p.balance = 0;
         }
-        totalCommitment=0;
+        totalCommitment = 0;
 
-    }else{
+    } else {
         finalized = true;
 
-
         uint remainingNeed = requiredTokens;
+        totalCollected = 0;
 
         for (uint i = 0; i < participants.length; i++) {
             Participant storage p = participants[i];
-            totalCommitment+=p.actualSupply;
-            if (remainingNeed == 0) {
+            totalCommitment += p.actualSupply;
+
+            if (p.actualSupply >= remainingNeed) {
+                uint accepted = remainingNeed;
                 p.amountMissed = 0;
-                p.incentive = 0;
+                p.incentive = int(accepted * 10);
                 p.penalty = 0;
-                p.balance = 0;
+                p.balance = p.incentive;
+                totalCollected += accepted;
+                remainingNeed = 0;
             } else {
-                if (p.actualSupply >= remainingNeed) {
-                    totalCollected+=remainingNeed;
-                    p.amountMissed = 0;
-                    p.penalty = 0;
-                    p.incentive = int(remainingNeed * 10);
-                    p.balance = p.incentive;
-                    remainingNeed = 0;
-                } else {
-                    p.amountMissed = p.commitment - p.actualSupply;
-                    p.penalty = int(p.amountMissed * 5);
-                    p.incentive = int(p.actualSupply * 10);
-                    p.balance = p.incentive - p.penalty;
-                    remainingNeed -= p.actualSupply;
-                    totalCollected+=p.actualSupply;
-                }
+                p.amountMissed = p.commitment - p.actualSupply;
+                p.incentive = int(p.actualSupply * 10);
+                p.penalty = int(p.amountMissed * 5);
+                if(p.incentive>p.penalty){
+                p.balance = p.incentive - p.penalty;}
+                else {p.balance=0;}
+                totalCollected += p.actualSupply;
+                remainingNeed -= p.actualSupply;
             }
         }
 
-        success=true;
-        message="Event successfully finalized";
+        // If collected >= requiredTokens, remove all penalties
+        if (totalCollected >= requiredTokens) {
+            for (uint i = 0; i < participants.length; i++) {
+                Participant storage p = participants[i];
+                p.penalty = 0;
+                p.balance = p.incentive;
+            }
+        }
 
+        success = true;
+        message = "Event successfully finalized";
     }
-    
 }
-
 
 
 

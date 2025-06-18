@@ -151,14 +151,14 @@ function InputData({contract}) {
       }));
       // console.log("after data map ",formatted);
       if(isCommitZero){
-        setAlertData("No participant has done any contribution.No penalty/incentive");
+        setAlertData("Participants Contribution Nill.No Incentives/No Penalty");
         setShowAlert(true);
       }else{
         if(contractSuccess){
-          setAlertData(`low volatage Event ${eventId} Achieved`);
+          setAlertData(`Low volatage Event ${eventId} Achieved`);
           setShowAlert(true);
         }else{
-          setAlertData(`low volatage Event ${eventId} not met`);
+          setAlertData(`Low volatage Event ${eventId} Not Met`);
           setShowAlert(true);
         }
       }
@@ -296,7 +296,7 @@ return (
           />
 
           <label htmlFor="Token" className="block font-medium text-gray-900">
-            Required NegWatt
+            Required Negawatts
           </label>
           <input
             type="number"
@@ -318,7 +318,7 @@ return (
 
         {/* Participant Registration */}
         <div className="w-full space-y-4">
-        <h2 className="text-2xl font-semibold text-center text-gray-800">Incentive Consumer Registeration</h2>
+        <h2 className="text-2xl font-semibold text-center text-gray-800">Incentive User Registration</h2>
           <label htmlFor="Id" className="block font-medium text-gray-700">
             Participant ID
           </label>
@@ -376,22 +376,22 @@ return (
         {haveResult && (
           <>
 
-            <h2 className="text-xl font-bold mb-4 text-green-900 text-center">
-              Negawatt Event Results (Required Negawatt: {requiredToken} kWh , Total Contribution: {totalCommitment} kWh)
+            <h2 className="text-xl font-bold mb-4 text-green-700 text-center">
+             Event {eventId} : Required Negawatts: {requiredToken} kWh , Total Contribution: {totalCommitment} kWh
             </h2>
 
             <div className={`text-center mb-4 ${success ? 'text-green-600' : 'text-red-600'}`}>
               <h3 className="text-lg font-semibold">
-                {success ? 'Required Demand-Supply Achieved!' : 'Required Demand-Supply Not Met'}
+                {success ? 'Result: Demand-Supply Achieved!' : 'Result: Demand-Supply Not Met'}
               </h3>
             </div>
 
             <table className="min-w-full table-auto border border-gray-800 border-collapse text-sm sm:text-base">
               <thead>
                 <tr className="bg-gray-200 text-left">
-                  <th className="border border-gray-800 px-2 py-2">ParticipantId</th>
-                  <th className="border border-gray-800 px-2 py-2">Commitment (KWh)</th>
-                  <th className="border border-gray-800 px-2 py-2">Contribution (KWh)</th>
+                  <th className="border border-gray-800 px-2 py-2">Participant Id</th>
+                  <th className="border border-gray-800 px-2 py-2">Commitment (kWh)</th>
+                  <th className="border border-gray-800 px-2 py-2">Contribution (kWh)</th>
                   <th className="border border-gray-800 px-2 py-2">Amount Missed</th>
                   <th className="border border-gray-800 px-2 py-2">Incentives in ₹(INR)</th>
                   <th className="border border-gray-800 px-2 py-2">Penalty in ₹(INR)</th>

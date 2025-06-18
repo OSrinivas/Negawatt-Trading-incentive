@@ -35,6 +35,41 @@
       "artifacts": [
         "NegawattIncentiveCurtailment"
       ]
+    },
+    "C:\\MY FILES March24\\MAY-2025\\IEEE NegawattChain\\IEEE Consumer Electronics\\TCE_CODE and screenshot\\Blockchain-Txn-both\\Blockchain-Txn-both\\contracts\\NegawattIncentiveCurtailment.sol": {
+      "lastModificationDate": 1749732866887,
+      "contentHash": "03675a1f5c0b95dee01acbb2e20a90ca",
+      "sourceName": "contracts/NegawattIncentiveCurtailment.sol",
+      "solcConfig": {
+        "version": "0.8.9",
+        "settings": {
+          "optimizer": {
+            "enabled": false,
+            "runs": 200
+          },
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [],
+      "versionPragmas": [
+        "^0.8.0"
+      ],
+      "artifacts": [
+        "NegawattIncentiveCurtailment"
+      ]
     }
   }
 }
